@@ -1,10 +1,9 @@
 # mozid
-
-**moz id** is a command-line tool for retrieving the extension ID from a Firefox `.xpi` add-on package. It automates the process of downloading a `.xpi` file from Mozilla's Add-ons website, extracting the `manifest.json`, and displaying the extension's unique ID.
+a command-line tool for retrieving the extension ID from a Firefox `.xpi` add-on package. It automates the process of downloading a `.xpi` file from Mozilla's Add-ons website, extracting the `manifest.json`, and displaying the extension's unique ID.
 
 ## Usage
-
 Clone the repository and make the script executable:
+
 ```bash
 git clone https://github.com/tupakkatapa/mozid.git
 cd mozid

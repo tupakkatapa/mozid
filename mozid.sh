@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+/sta!/usr/bin/env bash
 
 # Display usage information
 display_usage() {
@@ -60,13 +60,13 @@ done
 
 # Check if the URL is provided
 if [[ -z "$extension_url" ]]; then
-    echo "error: no url provided."
+    echo "error: no url provided"
     display_usage
     exit 1
 fi
 
 # Verbose output function
-log() {
+say() {
     if [[ "$verbose" = true ]]; then
         echo "$@"
     fi
@@ -78,50 +78,50 @@ if [[ ! "$TMP_DIR" || ! -d "$TMP_DIR" ]]; then
     echo "error: failed to create a temporary directory"
     exit 1
 fi
-log "using temporary directory: $TMP_DIR"
+say "status: using temporary directory '$TMP_DIR'"
 
 # Download the page and extract the .xpi URL
-log "fetching .xpi download link from: $extension_url"
+say "status: fetching .xpi download link from '$extension_url'"
 XPI_URL=$(curl -s "$extension_url" | grep -oP '(?<=href=")https://addons.mozilla.org/firefox/downloads/file/[^"]+.xpi(?=")' | head -n 1)
 if [ -z "$XPI_URL" ]; then
-    echo "error: failed to extract .xpi download link from the provided url"
+    echo "error: failed to extract '.xpi' download link from the provided url"
     rm -rf "$TMP_DIR"
     exit 1
 fi
-log "downloading .xpi file from: $XPI_URL"
+say "status: downloading .xpi file from '$XPI_URL'"
 
 # Download the .xpi file
 XPI_FILE="$TMP_DIR/extension.xpi"
 if ! wget -q -O "$XPI_FILE" "$XPI_URL"; then
-    echo "error: failed to download .xpi file"
+    echo "error: failed to download '.xpi' file"
     rm -rf "$TMP_DIR"
     exit 1
 fi
-log "downloaded .xpi file: $XPI_FILE"
+say "status: downloaded .xpi file '$XPI_FILE'"
 
 # Extract the files
 EXTRACT_DIR="$TMP_DIR/extracted_xpi"
 mkdir -p "$EXTRACT_DIR"
 if ! unzip -q "$XPI_FILE" -d "$EXTRACT_DIR"; then
-    echo "error: failed to extract .xpi file"
+    echo "error: failed to extract '.xpi' file"
     rm -rf "$TMP_DIR"
     exit 1
 fi
-log "extracted .xpi file to: $EXTRACT_DIR"
+say "status: extracted .xpi file to '$EXTRACT_DIR'"
 
 # Check if manifest.json exists
 MANIFEST_FILE="$EXTRACT_DIR/manifest.json"
 if [ ! -f "$MANIFEST_FILE" ]; then
-    echo "error: manifest.json not found in the extracted files"
+    echo "error: 'manifest.json' not found in the extracted files"
     rm -rf "$TMP_DIR"
     exit 1
 fi
-log "found manifest.json file"
+say "status: found 'manifest.json' file"
 
 # Extract the ID
 ID=$(grep -Po '(?<="id": ")[^"]+' "$MANIFEST_FILE")
 if [ -z "$ID" ]; then
-    echo "error: id not found in the manifest.json file"
+    echo "error: id not found in the 'manifest.json' file"
     rm -rf "$TMP_DIR"
     exit 1
 fi
@@ -138,4 +138,4 @@ fi
 
 # Clean up temporary directory
 rm -rf "$TMP_DIR"
-log "cleaned up temporary files"
+say "info: cleaned up temporary files"

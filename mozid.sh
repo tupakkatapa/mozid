@@ -134,9 +134,14 @@ fi
 # Extract the extension name from the URL
 EXTENSION_NAME=$(echo "$extension_url" | grep -oP '(?<=/addon/)[^/]+')
 
+# Extract homepage_url, author, and version
+HOMEPAGE_URL=$(jq -r '.homepage_url // empty' "$MANIFEST_FILE")
+AUTHOR=$(jq -r '.author // empty' "$MANIFEST_FILE")
+VERSION=$(jq -r '.version // empty' "$MANIFEST_FILE")
+
 # Output results in the appropriate format
 if [[ "$json_output" = true ]]; then
-    echo "{\"name\": \"$EXTENSION_NAME\", \"id\": \"$ID\", \"url\": \"$extension_url\"}"
+    echo "{\"name\": \"$EXTENSION_NAME\", \"id\": \"$ID\", \"url\": \"$extension_url\", \"homepage_url\": \"$HOMEPAGE_URL\", \"author\": \"$AUTHOR\", \"version\": \"$VERSION\"}"
 else
     echo "$ID"
 fi

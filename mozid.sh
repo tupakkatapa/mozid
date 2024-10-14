@@ -6,11 +6,14 @@ display_usage() {
 Usage: mozid [options] <url>
 
 Description:
-  This script downloads a Firefox extension from the given URL, extracts it, and retrieves the extension ID from the manifest.json file
+  This script downloads a Firefox extension from the given URL, extracts it, and retrieves the extension ID from the manifest.json file.
 
 Options:
   -v, --verbose
     Enable verbose output for debugging
+
+  --json
+    Output result in JSON format
 
   -h, --help
     Display this help message and exit
@@ -23,6 +26,7 @@ USAGE
 
 # Initialize variables
 verbose=false
+json_output=false
 extension_url=""
 
 # Parse arguments using a while loop
@@ -30,6 +34,10 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         -v | --verbose)
             verbose=true
+            shift
+            ;;
+        --json)
+            json_output=true
             shift
             ;;
         -h | --help)
@@ -114,6 +122,16 @@ log "found manifest.json file"
 ID=$(grep -Po '(?<="id": ")[^"]+' "$MANIFEST_FILE")
 if [ -z "$ID" ]; then
     echo "error: id not found in the manifest.json file"
+    rm -rf "$TMP_DIR"
+    exit 1
+fi
+
+# Extract the extension name from the URL
+EXTENSION_NAME=$(echo "$extension_url" | grep -oP '(?<=/addon/)[^/]+')
+
+# Output results in the appropriate format
+if [[ "$json_output" = true ]]; then
+    echo "{\"name\": \"$EXTENSION_NAME\", \"id\": \"$ID\", \"url\": \"$extension_url\"}"
 else
     echo "$ID"
 fi

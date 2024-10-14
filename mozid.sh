@@ -1,4 +1,4 @@
-/sta!/usr/bin/env bash
+#!/usr/bin/env bash
 
 # Display usage information
 display_usage() {

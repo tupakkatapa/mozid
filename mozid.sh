@@ -141,7 +141,7 @@ VERSION=$(jq -r '.version // empty' "$MANIFEST_FILE")
 
 # Output results in the appropriate format
 if [[ "$json_output" = true ]]; then
-    echo "{\"name\": \"$EXTENSION_NAME\", \"id\": \"$ID\", \"url\": \"$extension_url\", \"homepage_url\": \"$HOMEPAGE_URL\", \"author\": \"$AUTHOR\", \"version\": \"$VERSION\"}"
+    echo "{\"name\": \"$EXTENSION_NAME\", \"id\": \"$ID\", \"version\": \"$VERSION\", \"author\": \"$AUTHOR\", \"url\": \"$extension_url\", \"homepage_url\": \"$HOMEPAGE_URL\"}"
 else
     echo "$ID"
 fi

@@ -65,6 +65,11 @@ if [[ -z "$extension_url" ]]; then
     exit 1
 fi
 
+# Ensure the URL has a trailing slash
+if [[ "${extension_url: -1}" != "/" ]]; then
+    extension_url="${extension_url}/"
+fi
+
 # Verbose output function
 say() {
     if [[ "$verbose" = true ]]; then

@@ -7,7 +7,7 @@
       let
         pkgs = import nixpkgs { inherit system; };
         my-name = "mozid";
-        my-buildInputs = with pkgs; [ curl wget unzip gnugrep ];
+        my-buildInputs = with pkgs; [ curl wget unzip gnugrep jq ];
         my-script = (pkgs.writeScriptBin my-name (builtins.readFile ./mozid.sh)).overrideAttrs(old: {
           buildCommand = "${old.buildCommand}\n patchShebangs $out";
         });

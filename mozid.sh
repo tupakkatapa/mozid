@@ -77,8 +77,10 @@ say() {
     fi
 }
 
-# Create a temporary directory
+# Create a temporary directory and set trap for cleanup
 TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT SIGINT
+
 if [[ ! "$TMP_DIR" || ! -d "$TMP_DIR" ]]; then
     echo "error: failed to create a temporary directory"
     exit 1
@@ -90,7 +92,6 @@ say "status: fetching .xpi download link from '$extension_url'"
 XPI_URL=$(curl -s "$extension_url" | grep -oP '(?<=href=")https://addons.mozilla.org/firefox/downloads/file/[^"]+.xpi(?=")' | head -n 1)
 if [ -z "$XPI_URL" ]; then
     echo "error: failed to extract '.xpi' download link from the provided url"
-    rm -rf "$TMP_DIR"
     exit 1
 fi
 say "status: downloading .xpi file from '$XPI_URL'"
@@ -99,7 +100,6 @@ say "status: downloading .xpi file from '$XPI_URL'"
 XPI_FILE="$TMP_DIR/extension.xpi"
 if ! wget -q -O "$XPI_FILE" "$XPI_URL"; then
     echo "error: failed to download '.xpi' file"
-    rm -rf "$TMP_DIR"
     exit 1
 fi
 say "status: downloaded .xpi file '$XPI_FILE'"
@@ -109,7 +109,6 @@ EXTRACT_DIR="$TMP_DIR/extracted_xpi"
 mkdir -p "$EXTRACT_DIR"
 if ! unzip -q "$XPI_FILE" -d "$EXTRACT_DIR"; then
     echo "error: failed to extract '.xpi' file"
-    rm -rf "$TMP_DIR"
     exit 1
 fi
 say "status: extracted .xpi file to '$EXTRACT_DIR'"
@@ -118,7 +117,6 @@ say "status: extracted .xpi file to '$EXTRACT_DIR'"
 MANIFEST_FILE="$EXTRACT_DIR/manifest.json"
 if [ ! -f "$MANIFEST_FILE" ]; then
     echo "error: 'manifest.json' not found in the extracted files"
-    rm -rf "$TMP_DIR"
     exit 1
 fi
 say "status: found 'manifest.json' file"
@@ -127,7 +125,6 @@ say "status: found 'manifest.json' file"
 ID=$(grep -Po '(?<="id": ")[^"]+' "$MANIFEST_FILE")
 if [ -z "$ID" ]; then
     echo "error: id not found in the 'manifest.json' file"
-    rm -rf "$TMP_DIR"
     exit 1
 fi
 
@@ -152,6 +149,5 @@ else
   echo "$ID"
 fi
 
-# Clean up temporary directory
-rm -rf "$TMP_DIR"
+# The trap will automatically clean up the temporary directory
 say "info: cleaned up temporary files"

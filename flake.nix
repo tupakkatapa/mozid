@@ -1,24 +1,45 @@
-# https://ertt.ca/nix/shell-scripts/
 {
   description = "Mozid - retrieve Firefox add-on IDs";
+
   inputs.flake-utils.url = "github:numtide/flake-utils";
+
   outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+    {
+      # System-agnostic library (uses only builtins, no pkgs dependency)
+      lib = import ./lib.nix { };
+    }
+    // flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        my-name = "mozid";
-        my-buildInputs = with pkgs; [ curl wget unzip gnugrep jq ];
-        my-script = (pkgs.writeScriptBin my-name (builtins.readFile ./mozid.sh)).overrideAttrs(old: {
-          buildCommand = "${old.buildCommand}\n patchShebangs $out";
-        });
-      in rec {
-        defaultPackage = packages.mozid;
-        packages.mozid = pkgs.symlinkJoin {
-          name = my-name;
-          paths = [ my-script ] ++ my-buildInputs;
+
+        # Create a package with lib.nix in share directory
+        package = pkgs.stdenv.mkDerivation {
+          name = "mozid";
+          src = ./.;
+
           buildInputs = [ pkgs.makeWrapper ];
-          postBuild = "wrapProgram $out/bin/${my-name} --prefix PATH : $out/bin";
+
+          installPhase = ''
+            mkdir -p $out/bin $out/share/mozid
+
+            # Install lib.nix
+            cp ${./lib.nix} $out/share/mozid/lib.nix
+
+            # Create wrapper script
+            substitute ${./mozid.sh} $out/bin/mozid \
+              --replace '@lib@' "$out/share/mozid/lib.nix"
+
+            chmod +x $out/bin/mozid
+
+            # Wrap to ensure nix is in PATH
+            wrapProgram $out/bin/mozid \
+              --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nix ]}
+          '';
         };
+      in
+      {
+        packages.default = package;
+        packages.mozid = package;
       }
     );
 }

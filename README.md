@@ -37,6 +37,7 @@ Add mozid to your flake:
 Then use in your home-manager configuration:
 
 ```nix
+{ pkgs, mozid, ... }:
 {
   home-manager.users.youruser = {
     programs.firefox = {
@@ -57,9 +58,12 @@ Then use in your home-manager configuration:
 }
 ```
 
-**Alternative:** Use `getExtensionId` for more control:
+<details>
+<summary><b>Alternative:</b> Use <code>getExtensionId</code> for per-extension control</summary>
 
 ```nix
+# configuration.nix
+{ pkgs, mozid, ... }:
 {
   home-manager.users.youruser = {
     programs.firefox = {
@@ -83,6 +87,8 @@ Then use in your home-manager configuration:
   };
 }
 ```
+
+</details>
 
 ### As a Command-Line Tool
 

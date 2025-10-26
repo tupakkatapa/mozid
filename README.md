@@ -58,6 +58,13 @@ Then use in your home-manager configuration:
 }
 ```
 
+**Note:** Builds using mozid require the `--impure` flag because extension data is fetched from Mozilla's servers during the build process.
+
+```bash
+nix build .#yourhost --impure
+nixos-rebuild switch --flake .#yourhost --impure
+```
+
 <details>
 <summary><b>Alternative:</b> Use <code>getExtensionId</code> for per-extension control</summary>
 

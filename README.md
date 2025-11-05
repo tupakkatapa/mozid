@@ -5,9 +5,22 @@ This tool was inspired by the difficulty of retrieving the extension ID when non
 
 ## Usage
 
+### As a Command-Line Tool
+
+Run directly with Nix (accepts both slugs and URLs):
+```bash
+# Using addon slug
+nix run github:tupakkatapa/mozid -- vimium-ff
+
+# Using full URL
+nix run github:tupakkatapa/mozid -- https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/
+```
+
 ### As a Nix Library
 
-Add mozid to your flake:
+**Note**: Builds using mozid require the `--impure` flag because extension data is fetched from Mozilla's servers during the build process.
+
+1. Add mozid to your flake:
 
 ```nix
 {
@@ -34,7 +47,7 @@ Add mozid to your flake:
 }
 ```
 
-Then use in your home-manager configuration:
+2. Then use in your home-manager configuration:
 
 ```nix
 { pkgs, mozid, ... }:
@@ -56,13 +69,6 @@ Then use in your home-manager configuration:
     };
   };
 }
-```
-
-**Note:** Builds using mozid require the `--impure` flag because extension data is fetched from Mozilla's servers during the build process.
-
-```bash
-nix build .#yourhost --impure
-nixos-rebuild switch --flake .#yourhost --impure
 ```
 
 <details>
@@ -96,28 +102,4 @@ nixos-rebuild switch --flake .#yourhost --impure
 ```
 
 </details>
-
-### As a Command-Line Tool
-
-Run directly with Nix (accepts both slugs and URLs):
-```bash
-# Using addon slug
-nix run github:tupakkatapa/mozid -- vimium-ff
-# Output: {d7742d87-e61d-4b78-b8a1-b469842139fa}
-
-# Using full URL
-nix run github:tupakkatapa/mozid -- https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/
-# Output: uBlock0@raymondhill.net
-```
-
-### Without Nix
-
-Clone the repository and make the script executable:
-
-```bash
-git clone https://github.com/tupakkatapa/mozid.git
-cd mozid
-chmod +x mozid.sh
-./mozid.sh <url>
-```
 

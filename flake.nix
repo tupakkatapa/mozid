@@ -1,19 +1,19 @@
 {
   description = "Mozid - retrieve Firefox add-on IDs";
 
-  inputs.flake-utils.url = "github:numtide/flake-utils";
-
-  outputs = { self, nixpkgs, flake-utils }:
-    {
+  outputs = { self, nixpkgs }: let
+    systems = [ "aarch64-linux" "x86_64-linux" "aarch64-darwin" "x86_64-darwin" ];
+    forEachSystem = nixpkgs.lib.genAttrs systems;
+  in {
       # System-agnostic library (uses only builtins, no pkgs dependency)
       lib = import ./lib.nix { };
-    }
-    // flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs { inherit system; };
 
+      packages = forEachSystem (system: let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in {
+        default = self.packages.${system}.mozid;
         # Create a package with lib.nix in share directory
-        package = pkgs.stdenv.mkDerivation {
+        mozid = pkgs.stdenv.mkDerivation {
           name = "mozid";
           src = ./.;
 
@@ -36,10 +36,6 @@
               --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.nix ]}
           '';
         };
-      in
-      {
-        packages.default = package;
-        packages.mozid = package;
-      }
-    );
+      });
+    };
 }
